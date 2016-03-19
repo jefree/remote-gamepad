@@ -1,0 +1,1 @@
+A try to play with a wired gamepad as wireless using freepie and python.
