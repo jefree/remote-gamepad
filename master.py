@@ -2,8 +2,8 @@ import socket
 import json
 
 if starting:
-	SLAVE_IP = "192.168.0.11"
-	SLAVE_PORT = 6666
+	SLAVE_IP = "192.168.0.12"
+	SLAVE_PORT = 6000
 	
 	xbox1 = xbox360[0]
 	udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -37,8 +37,8 @@ def getXboxStatus(xbox):
 	status["right"] = xbox.right
 	status["left"] = xbox.left
 
-	status["lt"] = xbox.rightThumb	
-	status["rt"] = xbox.leftThumb
+	status["lth"] = xbox.rightThumb	
+	status["rth"] = xbox.leftThumb
 
 	status["rx"] = xbox.rightStickX	
 	status["ry"] = xbox.rightStickY
