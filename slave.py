@@ -1,7 +1,7 @@
 import socket
 import json
 
-SLAVE_IP = "192.168.0.12"
+SLAVE_IP = "127.0.0.1"
 SLAVE_PORT = 6003
 
 AXIS_CALIBRATOR = 17000
@@ -43,6 +43,9 @@ def setStatus(vjoy, data):
     for key, value in BUTTON_MAP.iteritems():
         vjoy.setButton(int(key), status[value])
 
+def setStatusByControl(controls, data):
+    setStatus(control, d) for (control, d) in zip(controls, data)
+
 udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp.bind((SLAVE_IP, SLAVE_PORT))
 
@@ -50,6 +53,4 @@ print ("listening on", SLAVE_PORT)
 
 while True:
     data, addr = udp.recvfrom(1024)
-
-    vjoy1 = vJoy[0]
-    setStatus(vjoy1, data)
+    setStatusByControl([vjoy1, vjoy2], data)
