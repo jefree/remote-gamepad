@@ -2,10 +2,11 @@ import socket
 import json
 
 if starting:
-  SLAVE_IP = "127.0.0.1"
-  SLAVE_PORT = 6000
+  SLAVE_IP = "192.168.0.10"
+  SLAVE_PORT = 6005
   
   xbox1 = xbox360[0]
+  xbox2 = xbox360[1]
   udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
   
 def update():
