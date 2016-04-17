@@ -1,60 +1,84 @@
 import socket
 import json
+import datetime
 
-SLAVE_IP = "192.168.0.10"
-SLAVE_PORT = 6005
+SLAVE_IP = socket.gethostbyname(socket.gethostname())
+PORT = 6067
+CONNECTION_REQUEST = "REMOTEPADCONNECTIONREQUEST"
+CONNECTION_ACCEPTED = "REMOTEPADCONNECTIONACCEPTED"
 
 AXIS_CALIBRATOR = 17000
 
+counter = 0
+
 BUTTON_MAP = {
-    "0": "lt",
-    "1": "lb",
-    "2": "rb",
-    "3": "rt",
+  "0": "lt",
+  "1": "lb",
+  "2": "rb",
+  "3": "rt",
 
-    "4": "a",
-    "5": "b",
-    "6": "y",
-    "7": "x",
+  "4": "a",
+  "5": "b",
+  "6": "y",
+  "7": "x",
 
-    "8": "up",
-    "9": "right",
-    "10": "down",
-    "11": "left",
+  "8": "up",
+  "9": "right",
+  "10": "down",
+  "11": "left",
 
-    "12": "back",
-    "13": "start",
+  "12": "back",
+  "13": "start",
 
-    "14": "rth",
-    "15": "lth"
+  "14": "rth",
+  "15": "lth"
 }
 
-def setStatus(vjoy, data):
+def setStatus(vjoy, status):
     
-    vjoy.x = status["lx"] * AXIS_CALIBRATOR
-    vjoy.y = status["ly"] * AXIS_CALIBRATOR
-    
-    vjoy.rx = status["rx"] * AXIS_CALIBRATOR
-    vjoy.ry = status["ry"] * AXIS_CALIBRATOR
-    
-    diagnostics.watch(vjoy.x)
+  vjoy.x = status["lx"] * AXIS_CALIBRATOR
+  vjoy.y = status["ly"] * AXIS_CALIBRATOR
+  
+  vjoy.rx = status["rx"] * AXIS_CALIBRATOR
+  vjoy.ry = status["ry"] * AXIS_CALIBRATOR
+  
+  diagnostics.debug(vjoy.x)
 
-    for key, value in BUTTON_MAP.iteritems():
-        vjoy.setButton(int(key), status[value])
+  for key, value in BUTTON_MAP.iteritems():
+      vjoy.setButton(int(key), status[value])
 
 def setStatusByControl(controls, statuses):
-    for (control, status) in zip(controls, statuses):
-        setStatus(control, status)
+  for (control, status) in zip(controls, statuses):
+    setStatus(control, status)
 
-udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-udp.bind((SLAVE_IP, SLAVE_PORT))
+def wait_for_server():
+  while True:
+    data, addr = udp.recvfrom(1024)
+    diagnostics.debug("data %s from %s " % (data, addr))
+        
+    if (data == CONNECTION_REQUEST):
+      diagnostics.debug("connected to %s" % addr[0])
+      accept_connection(addr[0])
+      run()
 
-vjoy1 = vJoy[0]
-vjoy2 = vJoy[1]
+def run():
+  while True:
+    diagnostics.debug(datetime.datetime.now())
 
-print ("listening on", SLAVE_PORT)
-
-while True:
     data, addr = udp.recvfrom(1024)
     statuses = json.loads(data)
     setStatusByControl([vjoy1, vjoy2], statuses)
+
+def accept_connection(addr):
+  udp.sendto(CONNECTION_ACCEPTED, (addr, PORT))
+
+if starting:
+	udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	udp.bind((SLAVE_IP, PORT))
+	
+	vjoy1 = vJoy[0]
+	vjoy2 = vJoy[1]
+	
+	diagnostics.debug("listening on %s" % PORT)
+	
+	wait_for_server()
