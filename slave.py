@@ -1,16 +1,33 @@
 import socket
 import json
 
-def setStatus(vjoy, status):
+def setStatus(xoutput, status):
+    xoutput.rx = status['rx']
+    xoutput.ry = status]'ry']
 
-    vjoy.x = status["lx"] * AXIS_CALIBRATOR
-    vjoy.y = status["ly"] * AXIS_CALIBRATOR
+    xoutput.lx = status['lx']
+    xoutput.ly = status['ly']
 
-    vjoy.rx = status["rx"] * AXIS_CALIBRATOR
-    vjoy.ry = status["ry"] * AXIS_CALIBRATOR
+    xoutput.Y = status['y']
+    xoutput.B = status['b']
+    xoutput.A = status['a']
+    xoutput.X = status['x']
 
-    for key, value in BUTTON_MAP.iteritems():
-            vjoy.setButton(int(key), status[value])
+    xoutput.L1 = status['lb']
+    xoutput.R1 = status['rb']
+    xoutput.L3 = status['lth']
+    xoutput.R3 = status['rth']
+
+    xoutput.L2 = 0 if status['lt'] else xoutput.TriggerMin
+    xoutput.R2 = 0 if status['rt'] else xoutput.TriggerMin
+
+    xoutput.Up = status['up']
+    xoutput.Right = status['right']
+    xoutput.Down = status['down']
+    xoutput.Left = status['left']
+
+    xoutput.Back = status['back']
+    xoutput.Start = status['start']
 
 def setStatusByControl(controls, statuses):
     for (control, status) in zip(controls, statuses):
@@ -30,7 +47,7 @@ def run():
     while True:
         data, addr = udp.recvfrom(1024)
         statuses = json.loads(data)
-        setStatusByControl([vjoy1, vjoy2], statuses)
+        setStatusByControl([xoutput1, xoutput2], statuses)
 
 def accept_connection(addr):
     udp.sendto(CONNECTION_ACCEPTED, (addr, PORT))
@@ -70,8 +87,8 @@ if starting:
     udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp.bind((SLAVE_IP, PORT))
 
-    vjoy1 = vJoy[0]
-    vjoy2 = vJoy[1]
+    xoutput1 = xoutput[0]
+    xoutput2 = xoutput[1]
 
     diagnostics.debug("listening on %s" % PORT)
 
